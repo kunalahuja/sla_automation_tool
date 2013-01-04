@@ -24,35 +24,24 @@ public class SLAXmlParser{
 	DefaultHandler handler = new DefaultHandler() {
 		 
 		boolean blink = false;
-		boolean blname = false;
-		boolean bnname = false;
-		boolean bsalary = false;
-		boolean bProgamNum = false;
 		boolean blinkEnd = false;
+		StringBuilder tempValue;
 		public void startElement(String uri, String localName,String qName, 
 	                Attributes attributes) throws SAXException {
 	 
-//			System.out.println("Start Element :" + qName);
 	 
 			if (qName.equalsIgnoreCase("TR")) {
 				slaObject = new SlaInfo();
 			}
 	 
-			if (qName.equalsIgnoreCase("TH")) {
-	
-			}
-	 
 			if (qName.equalsIgnoreCase("A")) {
-				
+				tempValue=new StringBuilder();
+
 				slaObject.setLink(attributes.getValue("href"));
 				blink = true;
 			}
 	 
-			if (qName.equalsIgnoreCase("TD")) {
-				if(blinkEnd){
-					bProgamNum = true;
-				}
-			}
+			
 	 
 		}
 	 
@@ -66,22 +55,22 @@ public class SLAXmlParser{
 			if(qName.equals("TH")){
 				blinkEnd = true;
 			}
+			if(qName.equals("A")){
+				slaObject.adddNameToList(tempValue.toString());
+				blinkEnd = false;
+			}
 		}
 	 
 		public void characters(char ch[], int start, int length) throws SAXException {
 	 
-			if (blink) {
-				slaObject.adddNameToList(new String(ch, start, length));
-				blink = false;
-			}
-	 
-			if(bProgamNum){
+			 if (tempValue!=null ) {
+			        for (int i=start; i<start+length; i++) {
+			            tempValue.append(ch[i]);
+			        }
+			    }
+
 				
-				String[] progNumbers = new String(ch,start,length).split("<BR />");
-				blinkEnd= false;
-				bProgamNum = false;
-			}
-	 
+
 		}
 	 
 	     };

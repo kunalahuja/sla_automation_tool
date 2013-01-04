@@ -3,6 +3,7 @@ package com.example.databases;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -19,7 +20,7 @@ public class DBAccess {
 	static  String password = "zaq12wsx";
 	static  String tableName = "sla_information";
 	
-	public  void DBAccess(){
+	public DBAccess(){
 		 System.out.println("MySQL Connect Example.");
       	       	        	 
       	  try {
@@ -39,7 +40,7 @@ public class DBAccess {
       	  
 	}
 	public void createTables(){
-		String createTable = "CREATE TABLE IF NOT EXISTS sla_information (" + "id INT, "
+		String createTable = "CREATE TABLE IF NOT EXISTS "+tableName+" (" + "id INT, "
 				+ "name TEXT, " + "program_number TINYTEXT, "
 				+ "supported TEXT)";
 		try {
@@ -54,10 +55,28 @@ public class DBAccess {
 		}
 	}
 
+	public void updatePK(){
+		String selectMax="SELECT max(id) from "+tableName;
+		try {
+			Connection conn = DriverManager.getConnection(url + dbName,
+					userName, password);
+			System.out.println("Connected to the database");
+			PreparedStatement s = conn.prepareStatement(selectMax);
+			ResultSet rs = s.executeQuery();
+			if(rs.next()){
+				pk=rs.getInt(1)+1;
+			}
+			s.close();
+			rs.close();
+			conn.close();
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+	}
 	public void saveResults(ArrayList<SlaInfo> p_list) {
 
 		try{
-			Connection conn = DriverManager.getConnection(url+dbName,userName,password);
+			Connection conn = DriverManager.getConnection(url+dbName+"?useServerPrepStmts=false&rewriteBatchedStatements=true",userName,password);
        	  System.out.println("Connected to the database");
        	  PreparedStatement s = conn.prepareStatement("Insert into "+ tableName + " VALUES(?,?,?,?)");
 

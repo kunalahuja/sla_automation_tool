@@ -71,10 +71,11 @@ public class SlaAutomationTool {
 		DBAccess databaseHelper = new DBAccess();
 		
 		databaseHelper.createTables();
+		databaseHelper.updatePK();
 		
 		Date timestart= new Date();
 
-		for (int pageCounter = pageStartIndex; pageCounter < resultPages.size(); pageCounter++) {
+		for (int pageCounter =pageStartIndex; pageCounter < resultPages.size(); pageCounter++) {
 			System.out.println("Start Time: "+timestart +" Current Time: "+new Date());
 			System.out
 					.println("--------------------------------------------SearchPageCounter: "
@@ -82,18 +83,17 @@ public class SlaAutomationTool {
 			String result = resultPages.get(pageCounter);
 			// System.out.println("Page Is: " + result);
 
+			
 			SLAXmlParser parser = new SLAXmlParser();
 			// String result = resultPages.get(0);
 		//	System.out.println("result:: " + result);
 			if (result.indexOf("<TBODY") != -1) {
 				//Get list of links for particular SLAs
 				list = parser
-						.parseDocument(result.substring(
-								result.indexOf("<TBODY"),
-								result.indexOf("/TBODY>") + 7));
+						.parseDocument(result);
 				System.out.println("Total number of results:: " + list.size());
-				
-				for (int programCounter = 0; programCounter < list.size(); programCounter++) {
+			
+				for (int programCounter =0; programCounter < list.size(); programCounter++) {
 					System.out.println("Name: " + programCounter + 1 + " "
 							+ list.get(programCounter).getProgramNames());
 					System.out.println("Link: " + list.get(programCounter).getLink());
@@ -130,6 +130,10 @@ public class SlaAutomationTool {
 
 					int startIndex = value
 							.indexOf("The following are Supporting Programs licensed with the Program");
+					if(startIndex==0){
+						startIndex = value
+								.indexOf("The following are Other IBM Programs licensed with the Programs");
+					}
 					// System.out.println("value is:: "+value);
 					if (startIndex > 0) {
 
@@ -255,8 +259,13 @@ public class SlaAutomationTool {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(fileName));
 			String line =null;
+			resultPages.clear();
 			while((line =reader.readLine())!=null){
-				 resultPages.add(line);
+				if(line.contains("<TBODY")){
+				 resultPages.add(line.substring(
+							line.indexOf("<TBODY"),
+							line.indexOf("/TBODY>") + 7).replaceAll("&", "&amp;"));
+				}
 			}
 
 			System.out.println("-----------------Finished reading search list------------------");
@@ -268,6 +277,19 @@ public class SlaAutomationTool {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		/*try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(new File("temp")));
+			for(String result : resultPages){
+				writer.write(result);
+				writer.newLine();
+			}
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 	}
 
 	private static void saveLeftover(String name, String fileContent) {

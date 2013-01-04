@@ -69,10 +69,10 @@ public class SlaInfo {
 	}
 
 	public void setSupportedPrograms(String programs) {
-		// TODO Auto-generated method stub
 		if(programs.contains("<br>")){
-			programs =programs.substring(programs.indexOf("<br>"));
+			programs =programs.replaceFirst("<br>","");
 			programs = programs.replace("<br>", ";");
+			programs= programs.replaceAll("&nbsp;", " ");
 			programs = programs.trim();
 		}
 		supportedPrograms = programs;

@@ -14,7 +14,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.example.data.LicenseInfo;
-import com.example.data.SlaInfo;
 
 public class PLCXmlParser {
 
@@ -25,39 +24,21 @@ public class PLCXmlParser {
 		DefaultHandler handler = new DefaultHandler() {
 			 
 			boolean blink = false;
-			boolean blname = false;
-			boolean bnname = false;
-			boolean bsalary = false;
-		 
+		
 			public void startElement(String uri, String localName,String qName, 
 		                Attributes attributes) throws SAXException {
-		 
-//				System.out.println("Start Element :" + qName);
 		 
 				if (qName.equalsIgnoreCase("SWTitle")) {
 					licenseInfoObject = new LicenseInfo();
 					licenseInfoObject.setNumber(attributes.getValue("synKey"));
 					blink = true;
 				}
-		 
-				if (qName.equalsIgnoreCase("TH")) {
-		
-				}
-		 
-				if (qName.equalsIgnoreCase("A")) {
-					
-				}
-		 
-				if (qName.equalsIgnoreCase("TD")) {
-					
-				}
-		 
+
 			}
 		 
 			public void endElement(String uri, String localName,
 				String qName) throws SAXException {
-		 
-//				System.out.println("End Element :" + qName);
+
 				if(qName.equals("SWTitle")){
 					listOfLicenseInfo.add(licenseInfoObject);
 				}
@@ -68,23 +49,7 @@ public class PLCXmlParser {
 				if (blink) {
 					licenseInfoObject.setName(new String(ch, start, length));
 					blink = false;
-				}
-		 
-				if (blname) {
-					System.out.println("Last Name : " + new String(ch, start, length));
-					blname = false;
-				}
-		 
-				if (bnname) {
-					System.out.println("Nick Name : " + new String(ch, start, length));
-					bnname = false;
-				}
-		 
-				if (bsalary) {
-					System.out.println("Salary : " + new String(ch, start, length));
-					bsalary = false;
-				}
-		 
+				}		
 			}
 		 
 		     };
